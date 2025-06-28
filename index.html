@@ -36,35 +36,6 @@
                 opacity: 0.95;
             }
         }
-        /* Estilos para o Modal da IA */
-        #ai-modal {
-            transition: opacity 0.3s ease-in-out;
-        }
-        #ai-modal-content {
-            transition: transform 0.3s ease-in-out;
-        }
-        .spinner {
-            border-top-color: #f472b6; /* pink-400 */
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* Scrollbar personalizada para o conteúdo da IA */
-        #ai-output::-webkit-scrollbar {
-            width: 8px;
-        }
-        #ai-output::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        #ai-output::-webkit-scrollbar-thumb {
-            background: #ec4899; /* pink-500 */
-            border-radius: 10px;
-        }
-        #ai-output::-webkit-scrollbar-thumb:hover {
-            background: #f472b6; /* pink-400 */
-        }
     </style>
 </head>
 <body class="bg-gray-900 text-white overflow-x-hidden">
@@ -105,14 +76,6 @@
                 </div>
             </footer>
             
-            <!-- ✨ Seção da IA ✨ -->
-            <section id="ai-section" class="mt-12 w-full max-w-3xl mx-auto opacity-0 transition-opacity duration-1000 delay-700">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-glow">Magia de Aniversário</h2>
-                <div class="flex justify-center">
-                    <button id="generate-facts-btn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105 w-full md:w-auto md:px-8">✨ Nossas Curiosidades</button>
-                </div>
-            </section>
-
             <div id="waiting-message" class="text-center opacity-0 transition-opacity duration-1000">
                 <h2 class="text-3xl font-semibold text-pink-300">A contagem começará em breve...</h2>
                 <p class="text-lg text-purple-300 mt-2">A preparar para celebrar o nosso tempo juntos.</p>
@@ -120,24 +83,6 @@
         </div>
     </div>
     
-    <!-- Modal para exibir conteúdo da IA -->
-    <div id="ai-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
-        <div id="ai-modal-content" class="bg-gray-800 border border-purple-500 rounded-2xl shadow-2xl w-full max-w-2xl transform scale-95">
-            <header class="flex justify-between items-center p-4 border-b border-gray-700">
-                <h3 id="ai-modal-title" class="text-xl font-bold text-pink-400"></h3>
-                <button id="ai-modal-close" class="text-gray-400 hover:text-white">&times;</button>
-            </header>
-            <main class="p-6">
-                <div id="ai-output" class="text-left text-purple-100 max-h-[60vh] overflow-y-auto pr-2 space-y-4 whitespace-pre-wrap"></div>
-                <div id="ai-loading" class="flex flex-col items-center justify-center p-8">
-                    <div class="spinner w-12 h-12 rounded-full border-4 border-gray-600"></div>
-                    <p class="mt-4 text-purple-300">A IA está a criar algo especial...</p>
-                </div>
-            </main>
-        </div>
-    </div>
-
-
     <script>
         // --- CONFIGURAÇÃO ---
         const relationshipStartDate = new Date('2025-06-07T19:32:00');
@@ -158,18 +103,9 @@
             scientific: document.getElementById('scientific'),
             milestonesSection: document.getElementById('milestones-section'),
             milestonesContainer: document.getElementById('milestones-container'),
-            aiSection: document.getElementById('ai-section'),
-            aiModal: document.getElementById('ai-modal'),
-            aiModalContent: document.getElementById('ai-modal-content'),
-            aiModalTitle: document.getElementById('ai-modal-title'),
-            aiModalClose: document.getElementById('ai-modal-close'),
-            aiOutput: document.getElementById('ai-output'),
-            aiLoading: document.getElementById('ai-loading'),
-            generateFactsBtn: document.getElementById('generate-facts-btn'),
         };
 
         // --- VARIÁVEIS DE ESTADO ---
-        let currentDurationString = "";
         let hasInitialized = false; // Flag para controlar a animação de entrada
 
         // --- LÓGICA DE DATAS E MARCOS ---
@@ -220,7 +156,6 @@
                 } else {
                     elements.mainContent.classList.remove('opacity-0');
                     elements.milestonesSection.classList.remove('opacity-0');
-                    elements.aiSection.classList.remove('opacity-0');
                 }
                 hasInitialized = true;
             }
@@ -257,8 +192,6 @@
             elements.milliseconds.textContent = String(diffMilliseconds % 1000).padStart(3, '0');
             elements.nanoseconds.textContent = String((diffMilliseconds % 1000) * 1000000).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             elements.scientific.textContent = totalSeconds.toExponential(4);
-
-            currentDurationString = `${yearsCount} anos, ${monthsCount} meses e ${daysCount} dias`;
             
             milestones.forEach((m, index) => updateMilestoneStatus(m, index, now));
         }
@@ -266,6 +199,8 @@
         function updateMilestoneStatus(milestone, index, now) {
             const container = document.getElementById(`milestone-${index}`);
             const statusEl = document.getElementById(`milestone-${index}-status`);
+            if (!container || !statusEl) return;
+            
             if (now >= milestone.date) {
                 statusEl.textContent = 'Alcançado! ✅';
                 statusEl.className = 'font-bold text-green-400';
@@ -276,66 +211,6 @@
             }
         }
         
-        // --- LÓGICA DA IA (GEMINI API) ---
-        async function generateContent(prompt) {
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) {
-                   const error = await response.json();
-                   throw new Error(`API Error: ${error.error.message}`);
-                }
-                const result = await response.json();
-                if (result.candidates && result.candidates.length > 0) {
-                    return result.candidates[0].content.parts[0].text;
-                }
-                throw new Error("Resposta da IA inválida ou vazia.");
-            } catch (error) {
-                console.error("Erro ao chamar a API do Gemini:", error);
-                return `Ocorreu um erro ao tentar gerar o conteúdo. Por favor, tente novamente mais tarde. Detalhe: ${error.message}`;
-            }
-        }
-
-        function showAIModal(title) {
-            elements.aiModalTitle.textContent = title;
-            elements.aiOutput.style.display = 'none';
-            elements.aiLoading.style.display = 'flex';
-            elements.aiModal.classList.remove('opacity-0', 'pointer-events-none');
-            elements.aiModalContent.classList.remove('scale-95');
-        }
-
-        function hideAIModal() {
-            elements.aiModal.classList.add('opacity-0', 'pointer-events-none');
-            elements.aiModalContent.classList.add('scale-95');
-        }
-        
-        async function handleFactsButtonClick() {
-            const title = "Curiosidades Sobre o Nosso Tempo";
-            const prompt = `Aja como um contador de factos divertidos. Crie uma lista de 3 factos surpreendentes e divertidos sobre a duração de ${currentDurationString}. Compare esta duração com coisas inesperadas e interessantes (por exemplo, viagens espaciais, fenómenos naturais, maratonas de séries, etc.). Seja criativo! Responda em português de Portugal.`;
-            
-            showAIModal(title);
-            const result = await generateContent(prompt);
-            elements.aiOutput.innerHTML = result.replace(/\n/g, '<br>');
-            elements.aiLoading.style.display = 'none';
-            elements.aiOutput.style.display = 'block';
-        }
-        
-        // --- EVENT LISTENERS ---
-        elements.generateFactsBtn.addEventListener('click', handleFactsButtonClick);
-        elements.aiModalClose.addEventListener('click', hideAIModal);
-        elements.aiModal.addEventListener('click', (e) => {
-            if (e.target === elements.aiModal) {
-                hideAIModal();
-            }
-        });
-
         // --- INICIALIZAÇÃO ---
         setupMilestones();
         updateCounter(); 
