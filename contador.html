@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Tempo Juntos ❤️</title>
+    
+    <!-- Importando Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Importando a fonte Poppins do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3), 0 0 12px rgba(236, 72, 153, 0.4);
+        }
+        .pulse-live {
+            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.95;
+            }
+        }
+        /* Estilos para o Modal da IA */
+        #ai-modal {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #ai-modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+        .spinner {
+            border-top-color: #f472b6; /* pink-400 */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Scrollbar personalizada para o conteúdo da IA */
+        #ai-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        #ai-output::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        #ai-output::-webkit-scrollbar-thumb {
+            background: #ec4899; /* pink-500 */
+            border-radius: 10px;
+        }
+        #ai-output::-webkit-scrollbar-thumb:hover {
+            background: #f472b6; /* pink-400 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white overflow-x-hidden">
+    <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
+
+        <div class="w-full max-w-5xl mx-auto text-center">
+            
+            <header class="mb-8">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-glow">Nosso Tempo Juntos</h1>
+                <p class="text-lg sm:text-xl text-pink-300 mt-2">Desde 07 de Junho de 2025, 19:32</p>
+            </header>
+
+            <main id="main-content" class="mb-8 opacity-0 transition-opacity duration-1000">
+                <!-- Grid para os contadores -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20"><div id="years" class="text-4xl md:text-5xl font-bold text-pink-400">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Anos</div></div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20"><div id="months" class="text-4xl md:text-5xl font-bold text-pink-400">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Meses</div></div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20"><div id="weeks" class="text-4xl md:text-5xl font-bold text-pink-400">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Semanas</div></div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20"><div id="days" class="text-4xl md:text-5xl font-bold text-pink-400">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Dias</div></div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20"><div id="hours" class="text-4xl md:text-5xl font-bold text-pink-400">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Horas</div></div>
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20"><div id="minutes" class="text-4xl md:text-5xl font-bold text-pink-400">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Minutos</div></div>
+                    <div class="col-span-2 sm:col-span-3 lg:col-span-6 bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/20 pulse-live"><div id="seconds" class="text-5xl md:text-7xl font-bold text-white text-glow">0</div><div class="text-sm md:text-base text-purple-200 mt-1">Segundos</div></div>
+                </div>
+
+                <!-- Contadores Detalhados -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                     <div class="bg-white/5 backdrop-blur-sm p-4 rounded-xl shadow-md border border-white/10"><h3 class="font-semibold text-purple-300 mb-2">Milissegundos</h3><p id="milliseconds" class="text-2xl font-mono text-pink-300">0</p></div>
+                     <div class="bg-white/5 backdrop-blur-sm p-4 rounded-xl shadow-md border border-white/10"><h3 class="font-semibold text-purple-300 mb-2">Nanossegundos (simulado)</h3><p id="nanoseconds" class="text-2xl font-mono text-pink-300">0</p></div>
+                     <div class="bg-white/5 backdrop-blur-sm p-4 rounded-xl shadow-md border border-white/10"><h3 class="font-semibold text-purple-300 mb-2">Notação Científica (s)</h3><p id="scientific" class="text-2xl font-mono text-pink-300">0</p></div>
+                </div>
+            </main>
+
+            <!-- Seção de Marcos (Milestones) -->
+            <footer id="milestones-section" class="mt-10 w-full max-w-3xl mx-auto opacity-0 transition-opacity duration-1000 delay-500">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-glow">Marcos Importantes</h2>
+                <div id="milestones-container" class="space-y-4 text-left">
+                     <!-- Milestones serão inseridos aqui pelo JS -->
+                </div>
+            </footer>
+            
+            <!-- ✨ Seção da IA ✨ -->
+            <section id="ai-section" class="mt-12 w-full max-w-3xl mx-auto opacity-0 transition-opacity duration-1000 delay-700">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-glow">Magia de Aniversário</h2>
+                <div class="flex justify-center">
+                    <button id="generate-facts-btn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105 w-full md:w-auto md:px-8">✨ Nossas Curiosidades</button>
+                </div>
+            </section>
+
+            <div id="waiting-message" class="text-center opacity-0 transition-opacity duration-1000">
+                <h2 class="text-3xl font-semibold text-pink-300">A contagem começará em breve...</h2>
+                <p class="text-lg text-purple-300 mt-2">A preparar para celebrar o nosso tempo juntos.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para exibir conteúdo da IA -->
+    <div id="ai-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div id="ai-modal-content" class="bg-gray-800 border border-purple-500 rounded-2xl shadow-2xl w-full max-w-2xl transform scale-95">
+            <header class="flex justify-between items-center p-4 border-b border-gray-700">
+                <h3 id="ai-modal-title" class="text-xl font-bold text-pink-400"></h3>
+                <button id="ai-modal-close" class="text-gray-400 hover:text-white">&times;</button>
+            </header>
+            <main class="p-6">
+                <div id="ai-output" class="text-left text-purple-100 max-h-[60vh] overflow-y-auto pr-2 space-y-4 whitespace-pre-wrap"></div>
+                <div id="ai-loading" class="flex flex-col items-center justify-center p-8">
+                    <div class="spinner w-12 h-12 rounded-full border-4 border-gray-600"></div>
+                    <p class="mt-4 text-purple-300">A IA está a criar algo especial...</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <script>
+        // --- CONFIGURAÇÃO ---
+        const relationshipStartDate = new Date('2025-06-07T19:32:00');
+
+        // --- ELEMENTOS DO DOM ---
+        const elements = {
+            mainContent: document.getElementById('main-content'),
+            waitingMessage: document.getElementById('waiting-message'),
+            years: document.getElementById('years'),
+            months: document.getElementById('months'),
+            weeks: document.getElementById('weeks'),
+            days: document.getElementById('days'),
+            hours: document.getElementById('hours'),
+            minutes: document.getElementById('minutes'),
+            seconds: document.getElementById('seconds'),
+            milliseconds: document.getElementById('milliseconds'),
+            nanoseconds: document.getElementById('nanoseconds'),
+            scientific: document.getElementById('scientific'),
+            milestonesSection: document.getElementById('milestones-section'),
+            milestonesContainer: document.getElementById('milestones-container'),
+            aiSection: document.getElementById('ai-section'),
+            aiModal: document.getElementById('ai-modal'),
+            aiModalContent: document.getElementById('ai-modal-content'),
+            aiModalTitle: document.getElementById('ai-modal-title'),
+            aiModalClose: document.getElementById('ai-modal-close'),
+            aiOutput: document.getElementById('ai-output'),
+            aiLoading: document.getElementById('ai-loading'),
+            generateFactsBtn: document.getElementById('generate-facts-btn'),
+        };
+
+        // --- VARIÁVEIS DE ESTADO ---
+        let currentDurationString = "";
+        let hasInitialized = false; // Flag para controlar a animação de entrada
+
+        // --- LÓGICA DE DATAS E MARCOS ---
+        const milestones = [
+            { label: 'Primeiro Mês', months: 1 },
+            { label: 'Seis Meses', months: 6 },
+            { label: 'Primeiro Aniversário', years: 1 },
+            { label: '500 Dias Juntos', days: 500 },
+            { label: 'Segundo Aniversário', years: 2 },
+        ];
+
+        function createMilestoneDate(baseDate, {years = 0, months = 0, days = 0}) {
+            const date = new Date(baseDate);
+            if (years) date.setFullYear(date.getFullYear() + years);
+            if (months) date.setMonth(date.getMonth() + months);
+            if (days) date.setDate(date.getDate() + days);
+            return date;
+        }
+        
+        const formatDate = (date) => date.toLocaleString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        function setupMilestones() {
+            milestones.forEach((m, index) => {
+                const milestoneDate = createMilestoneDate(relationshipStartDate, m);
+                const milestoneId = `milestone-${index}`;
+                const elementHTML = `
+                    <div id="${milestoneId}" class="bg-white/5 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/10 flex justify-between items-center transition-all duration-500">
+                        <div>
+                            <h3 class="font-semibold text-lg">${m.label}</h3>
+                            <p class="text-sm text-purple-300">Em: ${formatDate(milestoneDate)}</p>
+                        </div>
+                        <div id="${milestoneId}-status" class="font-bold text-gray-400">Pendente</div>
+                    </div>
+                `;
+                elements.milestonesContainer.innerHTML += elementHTML;
+                m.date = milestoneDate;
+            });
+        }
+        
+        // --- FUNÇÃO PRINCIPAL DE ATUALIZAÇÃO ---
+        function updateCounter() {
+            const now = new Date();
+            const diffMilliseconds = now - relationshipStartDate;
+
+            if (!hasInitialized) {
+                if (diffMilliseconds < 0) {
+                    elements.waitingMessage.classList.remove('opacity-0');
+                } else {
+                    elements.mainContent.classList.remove('opacity-0');
+                    elements.milestonesSection.classList.remove('opacity-0');
+                    elements.aiSection.classList.remove('opacity-0');
+                }
+                hasInitialized = true;
+            }
+
+            if (diffMilliseconds < 0) return;
+
+            const totalSeconds = diffMilliseconds / 1000;
+            const totalDays = diffMilliseconds / (1000 * 60 * 60 * 24);
+
+            let yearsCount = now.getFullYear() - relationshipStartDate.getFullYear();
+            let monthsCount = now.getMonth() - relationshipStartDate.getMonth();
+            let daysCount = now.getDate() - relationshipStartDate.getDate();
+            let hoursCount = now.getHours() - relationshipStartDate.getHours();
+            let minutesCount = now.getMinutes() - relationshipStartDate.getMinutes();
+            let secondsCount = now.getSeconds() - relationshipStartDate.getSeconds();
+
+            if (secondsCount < 0) { secondsCount += 60; minutesCount--; }
+            if (minutesCount < 0) { minutesCount += 60; hoursCount--; }
+            if (hoursCount < 0) { hoursCount += 24; daysCount--; }
+            if (daysCount < 0) {
+                const daysInLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                daysCount += daysInLastMonth;
+                monthsCount--;
+            }
+            if (monthsCount < 0) { monthsCount += 12; yearsCount--; }
+            
+            elements.years.textContent = yearsCount;
+            elements.months.textContent = monthsCount;
+            elements.weeks.textContent = Math.floor(totalDays / 7);
+            elements.days.textContent = daysCount;
+            elements.hours.textContent = String(hoursCount).padStart(2, '0');
+            elements.minutes.textContent = String(minutesCount).padStart(2, '0');
+            elements.seconds.textContent = String(secondsCount).padStart(2, '0');
+            elements.milliseconds.textContent = String(diffMilliseconds % 1000).padStart(3, '0');
+            elements.nanoseconds.textContent = String((diffMilliseconds % 1000) * 1000000).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            elements.scientific.textContent = totalSeconds.toExponential(4);
+
+            currentDurationString = `${yearsCount} anos, ${monthsCount} meses e ${daysCount} dias`;
+            
+            milestones.forEach((m, index) => updateMilestoneStatus(m, index, now));
+        }
+
+        function updateMilestoneStatus(milestone, index, now) {
+            const container = document.getElementById(`milestone-${index}`);
+            const statusEl = document.getElementById(`milestone-${index}-status`);
+            if (now >= milestone.date) {
+                statusEl.textContent = 'Alcançado! ✅';
+                statusEl.className = 'font-bold text-green-400';
+                container.classList.add('bg-green-500/10', 'border-green-400/50');
+            } else {
+                statusEl.textContent = 'Pendente';
+                statusEl.className = 'font-bold text-gray-400';
+            }
+        }
+        
+        // --- LÓGICA DA IA (GEMINI API) ---
+        async function generateContent(prompt) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                   const error = await response.json();
+                   throw new Error(`API Error: ${error.error.message}`);
+                }
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                }
+                throw new Error("Resposta da IA inválida ou vazia.");
+            } catch (error) {
+                console.error("Erro ao chamar a API do Gemini:", error);
+                return `Ocorreu um erro ao tentar gerar o conteúdo. Por favor, tente novamente mais tarde. Detalhe: ${error.message}`;
+            }
+        }
+
+        function showAIModal(title) {
+            elements.aiModalTitle.textContent = title;
+            elements.aiOutput.style.display = 'none';
+            elements.aiLoading.style.display = 'flex';
+            elements.aiModal.classList.remove('opacity-0', 'pointer-events-none');
+            elements.aiModalContent.classList.remove('scale-95');
+        }
+
+        function hideAIModal() {
+            elements.aiModal.classList.add('opacity-0', 'pointer-events-none');
+            elements.aiModalContent.classList.add('scale-95');
+        }
+        
+        async function handleFactsButtonClick() {
+            const title = "Curiosidades Sobre o Nosso Tempo";
+            const prompt = `Aja como um contador de factos divertidos. Crie uma lista de 3 factos surpreendentes e divertidos sobre a duração de ${currentDurationString}. Compare esta duração com coisas inesperadas e interessantes (por exemplo, viagens espaciais, fenómenos naturais, maratonas de séries, etc.). Seja criativo! Responda em português de Portugal.`;
+            
+            showAIModal(title);
+            const result = await generateContent(prompt);
+            elements.aiOutput.innerHTML = result.replace(/\n/g, '<br>');
+            elements.aiLoading.style.display = 'none';
+            elements.aiOutput.style.display = 'block';
+        }
+        
+        // --- EVENT LISTENERS ---
+        elements.generateFactsBtn.addEventListener('click', handleFactsButtonClick);
+        elements.aiModalClose.addEventListener('click', hideAIModal);
+        elements.aiModal.addEventListener('click', (e) => {
+            if (e.target === elements.aiModal) {
+                hideAIModal();
+            }
+        });
+
+        // --- INICIALIZAÇÃO ---
+        setupMilestones();
+        updateCounter(); 
+        setInterval(updateCounter, 100); 
+    </script>
+</body>
+</html>
